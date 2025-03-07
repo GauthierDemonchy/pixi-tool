@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Page PixiJS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.3/pixi.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Créer l'application PixiJS
+        const app = new PIXI.Application({
+            width: 800,
+            height: 600,
+            backgroundColor: 0x1099bb
+        });
+
+        // Ajouter l'élément de rendu à la page
+        document.body.appendChild(app.view);
+
+        // Vérification si l'application a été correctement initialisée
+        if (app.view) {
+            console.log("PixiJS Application initialisée avec succès!");
+        } else {
+            console.error("Erreur lors de l'initialisation de l'application PixiJS.");
+        }
+
+        // Ajouter un texte
+        const message = new PIXI.Text("Bonjour, voici une page dynamique !", { fill: "white" });
+        message.x = 200;
+        message.y = 250;
+        app.stage.addChild(message);
+    </script>
+</body>
+</html>
