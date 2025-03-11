@@ -1,36 +1,40 @@
 import gradio as gr
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-def calculer_imc(poids, taille):
-    taille_m = taille / 100  # Convertir en mètres
-    if taille_m <= 0 or poids <= 0:
-        return "Erreur : valeurs invalides."
+def calcul_imc(poids, taille):
+    """
+    Fonction pour calculer l'IMC et afficher un graphique.
+    """
+    # Calcul de l'IMC
+    imc = poids / (taille ** 2)
 
-    imc = poids / (taille_m ** 2)
+    # Créer un graphique
+    fig, ax = plt.subplots()
+    ax.plot([0, 1], [18.5, 18.5], label='Seuil sous-poids', color='red', linestyle='--')
+    ax.plot([0, 1], [24.9, 24.9], label='Seuil normal', color='green', linestyle='--')
+    ax.plot([0, 1], [29.9, 29.9], label='Seuil surpoids', color='orange', linestyle='--')
 
-    # Déterminer la catégorie
-    if imc < 18.5:
-        categorie = "Maigreur"
-        color = "blue"
-    elif 18.5 <= imc < 25:
-        categorie = "Corpulence normale"
-        color = "green"
-    elif 25 <= imc < 30:
-        categorie = "Surpoids"
-        color = "orange"
-    else:
-        categorie = "Obésité"
-        color = "red"
+    ax.scatter(0.5, imc, color='blue', label=f'IMC={imc:.2f}', zorder=5)
+    ax.set_title(f'IMC: {imc:.2f}')
+    ax.set_ylim(10, 40)
+    ax.set_ylabel('IMC')
+    ax.set_xticks([])
 
-    return f"<p style='color:{color}; font-size:18px;'>IMC : {imc:.2f} - {categorie}</p>"
+    # Ajouter les légendes
+    ax.legend()
+
+    return fig
 
 
-interface = gr.Interface(
-    fn=calculer_imc,
-    inputs=[gr.Number(label="Poids (kg)"), gr.Number(label="Taille (cm)")],
-    outputs="html",
-    title="Calculateur d'IMC",
-    description="Entrez votre poids et votre taille pour calculer votre IMC."
+# Interface Gradio
+iface = gr.Interface(
+    fn=calcul_imc,
+    inputs=[gr.Number(label="Poids (kg)"), gr.Number(label="Taille (m)")],
+    outputs=gr.Plot()
 )
 
-interface.launch()
+# Lancer l'application Gradio
+iface.launch()
+
