@@ -2,3 +2,5 @@ gradio
 matplotlib
 numpy
 pandas
+numpy
+io
