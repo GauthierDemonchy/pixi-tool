@@ -8,7 +8,7 @@ def calcul_imc(poids, taille):
     Fonction pour calculer l'IMC et afficher un graphique.
     """
     # Calcul de l'IMC
-    imc = poids / (taille ** 2)
+    imc = poids / ((taille/100) ** 2)
 
     # Créer un graphique
     fig, ax = plt.subplots()
@@ -31,7 +31,7 @@ def calcul_imc(poids, taille):
 # Interface Gradio
 iface = gr.Interface(
     fn=calcul_imc,
-    inputs=[gr.Number(label="Poids (kg)"), gr.Number(label="Taille (m)")],
+    inputs=[gr.Number(label="Poids (kg)"), gr.Number(label="Taille (cm)")],
     outputs=gr.Plot()
 )
 
