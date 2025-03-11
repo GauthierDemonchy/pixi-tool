@@ -45,8 +45,8 @@ def calculate_and_plot(system, material):
 
     # Création de la figure
     fig, ax = plt.subplots(figsize=(8, 6))
-    ax.plot(delta_uf, ges_system, 'r--', label=f"GES Exploitation ({system})")
-    ax.plot(delta_uf, ges_material, 'b-', label=f"GES Fabrication ({material})")
+    ax.plot(delta_uf, ges_system, 'r--', label=f"GES évités Exploitation ({system})")
+    ax.plot(delta_uf, ges_material, 'b-', label=f"GES émis nouveau cadre ({material})")
 
     # Marquer le point d'intersection s'il existe
     if intersection_uf is not None:
