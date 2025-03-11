@@ -1,0 +1,39 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install huggingface_hub
+
+      - name: Login to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          huggingface-cli login $HF_TOKEN
+
+      - name: Push to Hugging Face Space
+        run: |
+          git clone https://huggingface.co/spaces/ton-utilisateur/ton-space
+          cd ton-space
+          cp -r ../* .
+          git add .
+          git commit -m "Déploiement automatique via GitHub Actions"
+          git push
