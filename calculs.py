@@ -2,22 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 from PIL import Image
+from sklearn.linear_model import LinearRegression
+from data import data, coefficients  # Importation des données depuis data.py
+
+def estimate_uf(year, frame_type):
+    """
+    Estime Uf du cadre existant en fonction de l'année et du type de cadre
+    via une régression linéaire entre les années 1950 et 2020.
+    """
+    # Interpolation linéaire entre les années 1950 et 2020 pour estimer Uf du cadre existant
+    x = np.array([1950, 2020]).reshape(-1, 1)
+    y = np.array(data[frame_type])  # Uf de départ et fin pour chaque type de cadre
+
+    model = LinearRegression()
+    model.fit(x, y)
+    return model.predict([[year]])[0]
 
 def calculate_and_plot(system, material, uf_existing, uf_new):
     # Vérifier que Uf du nouveau cadre est inférieur à Uf de l'ancien cadre
     if uf_new >= uf_existing:
         return "Erreur : Uf du nouveau cadre doit être inférieur à Uf de l'ancien cadre.", None
-
-    # Coefficients des droites (a * Delta_Uf + b)
-    coefficients = {
-        "Pac COPA 2.7": (0.143, 0.000),
-        "Pac COPA 5.3": (0.086, 0.000),
-        "Chaudière gaz naturel": (0.575, 0.000),
-        "Cadre bois": (0.000, 0.041),
-        "Cadre bois métal": (0.000, 0.074),
-        "Cadre PVC": (0.000, 0.072),
-        "Cadre alu": (0.000, 0.149),
-    }
 
     a_system, b_system = coefficients[system]
     a_material, b_material = coefficients[material]
@@ -30,18 +34,16 @@ def calculate_and_plot(system, material, uf_existing, uf_new):
     ges_system = a_system * delta_uf_values + b_system
     ges_material = a_material * delta_uf_values + b_material
 
-    # Trouver l'intersection entre GES évités et GES émis par le producteur de chaleur
-    def find_intersection(delta_uf_values, ges_system, ges_material):
-        for i in range(len(delta_uf_values) - 1):
-            if (ges_system[i] - ges_material[i]) * (ges_system[i + 1] - ges_material[i + 1]) < 0:
-                x1, x2 = delta_uf_values[i], delta_uf_values[i + 1]
-                y1, y2 = ges_system[i] - ges_material[i], ges_system[i + 1] - ges_material[i + 1]
-                intersection_uf = x1 - y1 * (x2 - x1) / (y2 - y1)
-                intersection_ges = a_system * intersection_uf + b_system
-                return intersection_uf, intersection_ges
-        return None, None
+    # Trouver l'intersection entre les deux courbes (GES évités et GES émis)
+    def find_intersection(a1, b1, a2, b2):
+        if a1 != a2:  # Si les pentes sont différentes, on peut calculer l'intersection
+            intersection_uf = (b2 - b1) / (a1 - a2)
+            intersection_ges = a1 * intersection_uf + b1
+            return intersection_uf, intersection_ges
+        else:
+            return None, None  # Si les pentes sont égales, les lignes sont parallèles et n'ont pas d'intersection
 
-    intersection_uf, intersection_ges = find_intersection(delta_uf_values, ges_system, ges_material)
+    intersection_uf, intersection_ges = find_intersection(a_system, b_system, a_material, b_material)
 
     # Trouver l'intersection avec la droite verticale définie par delta_uf
     def find_vertical_intersection(delta_uf, ges_system, ges_material):
@@ -62,11 +64,11 @@ def calculate_and_plot(system, material, uf_existing, uf_new):
 
     # Création du graphique
     fig, ax = plt.subplots(figsize=(8, 6))
-    plt.subplots_adjust(bottom=0.25)  # Ajoute plus d'espace sous le graphe
+    plt.subplots_adjust(bottom=0.25)
 
-    # Zone de réutilisation (bleue) - sous la courbe des GES du cadre et Zone de remplacement (rouge) - au-dessus de la courbe des GES du cadre
-    ax.fill_between(delta_uf_values, 0, ges_material, color='blue', alpha=0.3, label="Réutilisation préférable")
-    ax.fill_between(delta_uf_values, ges_material, max(ges_system.max(), ges_material.max()), color='red', alpha=0.3, label="Remplacement optimal")
+    # Zone de réutilisation (bleue) - sous la courbe des GES du cadre et Zone de remplacement (rouge)
+    ax.fill_between(delta_uf_values, 0, ges_material, color='blue', alpha=0.2, label="Réutilisation préférable")
+    ax.fill_between(delta_uf_values, ges_material, max(ges_system.max(), ges_material.max()), color='red', alpha=0.2, label="Remplacement optimal")
 
     # Tracé des courbes
     ax.plot(delta_uf_values, ges_system, 'r--', label=f"GES évités Exploitation ({system})")
@@ -78,11 +80,13 @@ def calculate_and_plot(system, material, uf_existing, uf_new):
     # Affichage du point d'intersection (ancien point d'équilibre)
     if intersection_uf is not None:
         ax.scatter(intersection_uf, intersection_ges, color='black', zorder=3)
-        ax.annotate(f"Point d'équilibre\n({intersection_uf:.2f})",(intersection_uf, intersection_ges),textcoords="offset points", xytext=(-40, 5),ha='center', fontsize=10, fontweight='bold', color="black")
+        ax.annotate(f"Point d'équilibre\n({intersection_uf:.2f})", (intersection_uf, intersection_ges),
+                    textcoords="offset points", xytext=(-40, 5), ha='center', fontsize=10, fontweight='bold', color="black")
 
     # Affichage du nouveau point d'intersection avec la droite verticale
     ax.scatter(intersection_vertical_uf, ges_at_intersection_ges_system, color='purple', zorder=3)
-    ax.annotate(f"Cas actuel\n({intersection_vertical_uf:.2f})", (intersection_vertical_uf, ges_at_intersection_ges_system), textcoords="offset points", xytext=(+35, -25), ha='center', fontsize=10, fontweight='bold', color="purple")
+    ax.annotate(f"Cas actuel\n({intersection_vertical_uf:.2f})", (intersection_vertical_uf, ges_at_intersection_ges_system),
+                textcoords="offset points", xytext=(+35, -25), ha='center', fontsize=10, fontweight='bold', color="purple")
 
     # Paramètres du graphique
     ax.set_xlabel("ΔUf (W/m².K)")
