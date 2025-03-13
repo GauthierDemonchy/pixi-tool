@@ -1,3 +1,53 @@
+import numpy as np
+import pandas as pd
+
+# Chargement des facteurs d'émission depuis output1.csv
+file_path = "output1.csv"
+factors_df = pd.read_csv(file_path, delimiter=";", names=["Producer", "Emission Factor"], dtype=str, encoding="latin1")
+
+
+# Nettoyage des données
+factors_df["Producer"] = factors_df["Producer"].str.strip()  # Suppression des espaces
+factors_df["Emission Factor"] = factors_df["Emission Factor"].str.replace(",", ".").astype(float)  # Conversion des nombres
+
+# Définition des valeurs de Qh en fonction de Delta Uf
+q_h_values = np.array([0.000,0.250,0.500,0.750,1.000,1.250,1.472,1.722,1.972,2.222,2.472,2.722,2.944])
+delta_uf_values = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2])
+
+
+# Fonction pour calculer les coefficients GES
+def calculate_ges_coefficients(producer_name):
+    """
+    Calcule le coefficient GES (a) en imposant b = 0.
+    """
+    factor = factors_df.loc[factors_df["Producer"] == producer_name, "Emission Factor"].values
+    if len(factor) == 0:
+        raise ValueError(f"Facteur d'émission introuvable pour {producer_name}")
+
+    factor = factor[0]
+    ges_values = q_h_values * factor
+
+    # Régression linéaire sans intercept (forcée à 0)
+    a, _, _, _ = np.linalg.lstsq(delta_uf_values.reshape(-1, 1), ges_values, rcond=None)
+
+    return a[0], 0  # b est forcé à 0
+
+
+# Calcul des coefficients pour les systèmes de chauffage
+coefficients = {
+    "Pac COPA 2,7": calculate_ges_coefficients("Pac COPA 2,7"),
+    "Pac COPA 5,3": calculate_ges_coefficients("Pac COPA 5,3"),
+    "Chaudière gaz naturel": calculate_ges_coefficients("Chaudière gaz naturel"),
+    "Chaudière biogaz": calculate_ges_coefficients("Chaudière biogaz"),
+    "Cadre bois": (0.000, 0.041),
+    "Cadre bois métal": (0.000, 0.074),
+    "Cadre PVC": (0.000, 0.072),
+    "Cadre alu": (0.000, 0.149),
+}
+
+# Affichage des coefficients calculés
+for key, value in coefficients.items():
+    print(f"{key}: a = {value[0]:.3f}, b = {value[1]:.3f}")
 
 # Données pour la régression Uf selon le type de cadre
 data = {
@@ -5,15 +55,4 @@ data = {
     "Bois-métal": [1.8, 1],
     "PVC": [1.8, 1.3],
     "Alu": [3.6, 1.35]
-}
-
-# Coefficients des systèmes et matériaux pour le calcul des GES
-coefficients = {
-    "Pac COPA 2.7": (0.086, 0.000),
-    "Pac COPA 5.3": (0.143, 0.000),
-    "Chaudière gaz naturel": (0.575, 0.000),
-    "Cadre bois": (0.000, 0.041),
-    "Cadre bois métal": (0.000, 0.074),
-    "Cadre PVC": (0.000, 0.072),
-    "Cadre alu": (0.000, 0.149),
 }
