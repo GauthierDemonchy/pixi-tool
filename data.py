@@ -1,10 +1,10 @@
 
 # Données pour la régression Uf selon le type de cadre
 data = {
-    "Bois": [1.9, 0.7],
-    "Bois-métal": [2.1, 0.9],
-    "PVC": [1.7, 0.6],
-    "Alu": [2.5, 1.5]
+    "Bois": [1.8, 0.9],
+    "Bois-métal": [1.8, 1],
+    "PVC": [1.8, 1.3],
+    "Alu": [3.6, 1.35]
 }
 
 # Coefficients des systèmes et matériaux pour le calcul des GES

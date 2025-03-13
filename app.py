@@ -52,6 +52,8 @@ with gr.Blocks(css="styles.css") as demo:
         system = gr.Radio(["Pac COPA 2.7", "Pac COPA 5.3", "Chaudière gaz naturel"], label="Système de chauffage")
         material = gr.Radio(["Cadre bois", "Cadre bois métal", "Cadre PVC", "Cadre alu"],
                             label="Matériau du nouveau cadre")
+    # Uf du nouveau cadre
+    uf_new = gr.Number(label="Uf du cadre nouveau (W/m².K)")
 
     # Mode d'entrée du Uf
     uf_known = gr.Radio(
@@ -64,8 +66,6 @@ with gr.Blocks(css="styles.css") as demo:
         year = gr.Number(label="Année du bâtiment", visible=False)
         frame_type = gr.Radio(["Bois", "Bois-métal", "PVC", "Alu"], label="Type de cadre existant", visible=False)
 
-    # Uf du nouveau cadre
-    uf_new = gr.Number(label="Uf du cadre nouveau (W/m².K)")
 
     # Mettre à jour la visibilité
     uf_known.change(fn=update_visibility, inputs=uf_known, outputs=[uf_existing, year, frame_type])
