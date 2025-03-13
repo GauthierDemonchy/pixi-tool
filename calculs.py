@@ -10,7 +10,7 @@ def estimate_uf(year, frame_type):
     via une régression linéaire entre les années 1950 et 2020.
     """
     # Années de référence
-    x = np.array([1950, 2020])
+    x = np.array([1960, 2020])
     # Valeurs Uf correspondantes
     y = np.array(data[frame_type])
 
