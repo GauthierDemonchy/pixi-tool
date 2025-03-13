@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 from PIL import Image
-from sklearn.linear_model import LinearRegression
 from data import data, coefficients  # Importation des données depuis data.py
 
 def estimate_uf(year, frame_type):
@@ -10,13 +9,19 @@ def estimate_uf(year, frame_type):
     Estime Uf du cadre existant en fonction de l'année et du type de cadre
     via une régression linéaire entre les années 1950 et 2020.
     """
-    # Interpolation linéaire entre les années 1950 et 2020 pour estimer Uf du cadre existant
-    x = np.array([1950, 2020]).reshape(-1, 1)
-    y = np.array(data[frame_type])  # Uf de départ et fin pour chaque type de cadre
+    # Années de référence
+    x = np.array([1950, 2020])
+    # Valeurs Uf correspondantes
+    y = np.array(data[frame_type])
 
-    model = LinearRegression()
-    model.fit(x, y)
-    return model.predict([[year]])[0]
+    # Calcul de la pente (coefficient directeur)
+    slope = (y[1] - y[0]) / (x[1] - x[0])
+    # Calcul de l'ordonnée à l'origine
+    intercept = y[0] - slope * x[0]
+
+    # Prédiction de Uf pour l'année donnée
+    return slope * year + intercept
+
 
 def calculate_and_plot(system, material, uf_existing, uf_new):
     # Vérifier que Uf du nouveau cadre est inférieur à Uf de l'ancien cadre

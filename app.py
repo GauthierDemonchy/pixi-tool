@@ -79,4 +79,4 @@ with gr.Blocks(css="styles.css") as demo:
                         outputs=[result, image_output])
 
 # Lancer l'interface
-demo.launch(server_name="0.0.0.0", server_port=7860)
+demo.launch()
