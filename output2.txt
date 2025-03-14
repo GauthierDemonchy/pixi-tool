@@ -5,5 +5,5 @@ Pac COPA 3,2;0,048
 Chaudiere gaz naturel;0,234
 Chaudiere biogaz;0,127
 Chaudiere mazout;0,0343
-Chaudiere buche;0,021
+Chaudiere buche;0,033
 Chaudiere pellet;0,038

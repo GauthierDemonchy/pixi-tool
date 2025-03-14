@@ -15,8 +15,18 @@ Si le point de croisement est atteint, le remplacement est intéressant. Sinon, 
 💡 **Attention :** Uf du nouveau cadre doit être inférieur à celui de l'ancien.
 """
 
+# Définition des choix possibles
+options_chauffage = {
+    "Pompe à chaleur": ["Pac COPA 2,7", "Pac COPA 5,3", "Pac COPA 3,2", "Pac COPA 4,4"],
+    "Chaudiere": ["Chaudiere gaz naturel", "Chaudiere pellet", "Chaudiere buche", "Chaudiere biogaz"]
+}
+
+# Mise à jour des options de chauffage dynamiquement
+def update_heating_options(choice):
+    return gr.update(choices=options_chauffage[choice], value=options_chauffage[choice][0])
+
 # Fonction de gestion des entrées utilisateur
-def handle_input(system, material, uf_known, uf_existing, year, frame_type, uf_new):
+def handle_input(heating_type, system, material, uf_known, uf_existing, year, frame_type, uf_new):
     if uf_new <= 0:
         return "⚠️ Veuillez entrer une valeur de Uf valide pour le nouveau cadre.", None
 
@@ -44,11 +54,18 @@ def update_visibility(uf_known):
 with gr.Blocks(css="styles.css") as demo:
     gr.Markdown(description)
 
-    # Système de chauffage et Matériau
+    # Sélection du type de chauffage
     with gr.Row():
-        system = gr.Radio(["Pac COPA 2,7", "Pac COPA 5,3", "Pac COPA 3,2", "Pac COPA 4,4","Chaudiere gaz naturel", "Chaudiere pellet","Chaudiere buche", "Chaudiere biogaz"], label="Système de chauffage")
-        material = gr.Radio(["Cadre bois", "Cadre bois métal", "Cadre PVC", "Cadre alu"],
-                            label="Matériau du nouveau cadre")
+        heating_type = gr.Radio(["Pompe à chaleur", "Chaudiere"], label="Type de chauffage", value="Pompe à chaleur")
+        system = gr.Dropdown(choices=options_chauffage["Pompe à chaleur"], label="Système de chauffage")
+
+    # Mise à jour dynamique des systèmes de chauffage
+    heating_type.change(fn=update_heating_options, inputs=heating_type, outputs=system)
+
+    # Sélection du matériau
+    material = gr.Radio(["Cadre bois", "Cadre bois métal", "Cadre PVC", "Cadre alu"],
+                        label="Matériau du nouveau cadre")
+
     # Uf du nouveau cadre
     uf_new = gr.Number(label="Uf du cadre nouveau (W/m².K)")
 
@@ -71,7 +88,7 @@ with gr.Blocks(css="styles.css") as demo:
     result = gr.Textbox(label="Résultat")
     image_output = gr.Image(label="Graphique")
 
-    submit_button.click(fn=handle_input, inputs=[system, material, uf_known, uf_existing, year, frame_type, uf_new],
+    submit_button.click(fn=handle_input, inputs=[heating_type, system, material, uf_known, uf_existing, year, frame_type, uf_new],
                         outputs=[result, image_output])
 
 # Lancer l'interface

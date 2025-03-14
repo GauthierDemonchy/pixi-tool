@@ -2,13 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 from PIL import Image
-from data import data, coefficients  # Importation des données depuis data.py
 
+
+
+# Déplacer l'importation des données dans les fonctions où elles sont nécessaires
 def estimate_uf(year, frame_type):
     """
     Estime Uf du cadre existant en fonction de l'année et du type de cadre
     via une régression linéaire entre les années 1950 et 2020.
     """
+    from data import data  # Importation à l'intérieur de la fonction pour éviter la boucle circulaire
+
     # Années de référence
     x = np.array([1960, 2020])
     # Valeurs Uf correspondantes
@@ -24,6 +28,8 @@ def estimate_uf(year, frame_type):
 
 
 def calculate_and_plot(system, material, uf_existing, uf_new):
+    from data import coefficients  # Importation à l'intérieur de la fonction pour éviter la boucle circulaire
+
     # Vérifier que Uf du nouveau cadre est inférieur à Uf de l'ancien cadre
     if uf_new >= uf_existing:
         return "Erreur : Uf du nouveau cadre doit être inférieur à Uf de l'ancien cadre.", None

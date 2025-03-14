@@ -4,14 +4,12 @@ import pandas as pd
 # Chargement des facteurs d'émission depuis output1.csv
 file_path = "output2.txt"
 factors_df = pd.read_csv(file_path, delimiter=";", names=["Producer", "Emission Factor"], dtype=str, encoding="latin1")
-print("Valeurs uniques de Producer :", factors_df["Producer"].unique())
-
 
 
 # Nettoyage des données
 factors_df["Emission Factor"] = factors_df["Emission Factor"].str.replace(",", ".").astype(float)  # Conversion des nombres
 
-# Définition des valeurs de Qh en fonction de Delta Uf
+# Définition des valeurs de Qh en fonction de Delta Uf établi à partir de lesosai
 q_h_values = np.array([0.000,0.250,0.500,0.750,1.000,1.250,1.472,1.722,1.972,2.222,2.472,2.722,2.944])
 delta_uf_values = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2])
 
