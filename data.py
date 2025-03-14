@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd
 
 # Chargement des facteurs d'émission depuis output1.csv
-file_path = "output1.csv"
+file_path = "output2.txt"
 factors_df = pd.read_csv(file_path, delimiter=";", names=["Producer", "Emission Factor"], dtype=str, encoding="latin1")
+print("Valeurs uniques de Producer :", factors_df["Producer"].unique())
+
 
 
 # Nettoyage des données
-factors_df["Producer"] = factors_df["Producer"].str.strip()  # Suppression des espaces
 factors_df["Emission Factor"] = factors_df["Emission Factor"].str.replace(",", ".").astype(float)  # Conversion des nombres
 
 # Définition des valeurs de Qh en fonction de Delta Uf
@@ -37,8 +38,12 @@ def calculate_ges_coefficients(producer_name):
 coefficients = {
     "Pac COPA 2,7": calculate_ges_coefficients("Pac COPA 2,7"),
     "Pac COPA 5,3": calculate_ges_coefficients("Pac COPA 5,3"),
-    "Chaudière gaz naturel": calculate_ges_coefficients("Chaudière gaz naturel"),
-    "Chaudière biogaz": calculate_ges_coefficients("Chaudière biogaz"),
+    "Chaudiere gaz naturel": calculate_ges_coefficients("Chaudiere gaz naturel"),
+    "Chaudiere biogaz": calculate_ges_coefficients("Chaudiere biogaz"),
+    "Pac COPA 4,4": calculate_ges_coefficients("Pac COPA 4,4"),
+    "Pac COPA 3,2": calculate_ges_coefficients("Pac COPA 3,2"),
+    "Chaudiere pellet": calculate_ges_coefficients("Chaudiere pellet"),
+    "Chaudiere buche": calculate_ges_coefficients("Chaudiere buche"),
     "Cadre bois": (0.000, 0.041),
     "Cadre bois métal": (0.000, 0.074),
     "Cadre PVC": (0.000, 0.072),

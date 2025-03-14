@@ -46,7 +46,7 @@ with gr.Blocks(css="styles.css") as demo:
 
     # Système de chauffage et Matériau
     with gr.Row():
-        system = gr.Radio(["Pac COPA 2,7", "Pac COPA 5,3", "Chaudière gaz naturel", "Chaudière biogaz"], label="Système de chauffage")
+        system = gr.Radio(["Pac COPA 2,7", "Pac COPA 5,3", "Pac COPA 3,2", "Pac COPA 4,4","Chaudiere gaz naturel", "Chaudiere pellet","Chaudiere buche", "Chaudiere biogaz"], label="Système de chauffage")
         material = gr.Radio(["Cadre bois", "Cadre bois métal", "Cadre PVC", "Cadre alu"],
                             label="Matériau du nouveau cadre")
     # Uf du nouveau cadre
