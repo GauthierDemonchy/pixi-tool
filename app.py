@@ -10,14 +10,14 @@ Il compare :
 🔴 **Les émissions de GES évitées** grâce à une meilleure performance thermique (chauffage)  
 🔵 **Les émissions de GES dues** à la fabrication du nouveau cadre  
 
-Si le point de croisement est atteint, le remplacement est intéressant. Sinon, la réutilisation est préférable !  
+Si le point de croisement est atteint, le remplacement des cadres est intéressant. Sinon, la réutilisation est la solution optimal sur l'aspect environnemental !  
 
 💡 **Attention :** Uf du nouveau cadre doit être inférieur à celui de l'ancien.
 """
 
 # Définition des choix possibles
 options_chauffage = {
-    "Pompe à chaleur": ["Pac COPA 2,7", "Pac COPA 5,3", "Pac COPA 3,2", "Pac COPA 4,4"],
+    "Pompe à chaleur": ["Pac COPA 2,7",  "Pac COPA 3,2", "Pac COPA 4,4", "Pac COPA 5,3"],
     "Chaudiere": ["Chaudiere gaz naturel", "Chaudiere pellet", "Chaudiere buche", "Chaudiere biogaz"]
 }
 
@@ -51,8 +51,18 @@ def update_visibility(uf_known):
     return gr.update(visible=is_known), gr.update(visible=not is_known), gr.update(visible=not is_known)
 
 # Interface Gradio
-with gr.Blocks(css="styles.css") as demo:
-    gr.Markdown(description)
+with gr.Blocks(css="""
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+""") as demo:
+
+    with gr.Row(elem_classes="header-container"):
+        gr.Markdown(description)
+        gr.Image("picture_1.jpeg", elem_id="top-right-image", show_label=False, container=False, width=250, height=250)
 
     # Sélection du type de chauffage
     with gr.Row():
@@ -85,8 +95,8 @@ with gr.Blocks(css="styles.css") as demo:
 
     # Bouton et résultats
     submit_button = gr.Button("Calculer")
-    result = gr.Textbox(label="Résultat")
-    image_output = gr.Image(label="Graphique")
+    result = gr.Textbox(label="Résultat",container=False)
+    image_output = gr.Image(label="Graphique",container=False)
 
     submit_button.click(fn=handle_input, inputs=[heating_type, system, material, uf_known, uf_existing, year, frame_type, uf_new],
                         outputs=[result, image_output])

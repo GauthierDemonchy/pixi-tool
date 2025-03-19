@@ -1,0 +1,11 @@
+css = """
+#top-right-image {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 150px; /* Ajuste la taille si besoin */
+    height: auto;
+}
+"""
+
+with gr.Blocks(css=css) as demo:
