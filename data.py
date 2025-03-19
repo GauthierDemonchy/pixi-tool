@@ -48,10 +48,6 @@ coefficients = {
     "Cadre alu": (0.000, 0.149),
 }
 
-# Affichage des coefficients calculés
-for key, value in coefficients.items():
-    print(f"{key}: a = {value[0]:.3f}, b = {value[1]:.3f}")
-
 # Données pour la régression Uf selon le type de cadre
 data = {
     "Bois": [1.8, 0.9],
